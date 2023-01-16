@@ -10,23 +10,6 @@ void setup() {
   CircuitPlayground.begin();
 }
 
-void runTimer() {
-  Serial.print("got here! ");
-  for(int x=(timer/600000)-1; x>=0; x--) {
-    delay(600000); //waits for one timer interval
-    CircuitPlayground.setPixelColor(x, 255, 0, 0); //turns one LED red, as the timer intervals go down
-  }
-  //Timer ringing
-  pushButtonRight = CircuitPlayground.rightButton(); //checks and writes the state of the right button
-  while(!(pushButtonRight)) {  //loops through the alarm tone, checking to see if the OFF button is pressed
-    CircuitPlayground.playTone(261.626, 100); //plays beep alarm tone for 1/10 of a second
-    pushButtonRight = CircuitPlayground.rightButton(); //checks and writes the state of the right button
-  }
-  for(int i=0; i<= (timer/600000)-1; i++) {
-    CircuitPlayground.setPixelColor(i, 255, 255, 255); //turns all of the red countdown LEDs white again, showing the timer is restarted
-  }
-}
-
 void loop() {
   //Setting the timer variable
   pushButtonLeft = CircuitPlayground.leftButton(); //checks and writes the state of the left button
@@ -35,7 +18,7 @@ void loop() {
     timer += 600000; //increases the timer by the timer interval (currently 10 minutes)
     CircuitPlayground.setPixelColor((timer/600000)-1, 255, 255, 255); //lights up one more LED
     if(timer>6000000) {
-      timer=0; //resets the timer once it reaches the maximum (currently 100 minutes )
+      timer=0; //resets the timer once it reaches the maximum (currently 10 seconds)
       CircuitPlayground.clearPixels(); //resets all LEDS
     }
   }
@@ -47,7 +30,20 @@ void loop() {
       pushButtonRight = CircuitPlayground.rightButton(); //checks and writes the state of the right button
       delay(100); //wait 100 milliseconds
       if(!(pushButtonRight) && timer>0) { //checks to see if the right button has been released
-        runTimer(); //runs the timer procedure
+        y=0; //resets y, so that it doesn't have the same value the next time the right button is pressed
+        for(int x=(timer/600000)-1; x>=0; x--) {
+          delay(600000); //waits for one timer interval
+          CircuitPlayground.setPixelColor(x, 255, 0, 0); //turns one LED red, as the timer intervals go down
+        }
+        //Timer ringing
+        pushButtonRight = CircuitPlayground.rightButton(); //checks and writes the state of the right button
+        while(!(pushButtonRight)) {  //loops through the alarm tone, checking to see if the OFF button is pressed
+          CircuitPlayground.playTone(261.626, 100); //plays beep alarm tone for 1/10 of a second
+          pushButtonRight = CircuitPlayground.rightButton(); //checks and writes the state of the right button
+        }
+        for(int i=0; i<= (timer/600000)-1; i++) {
+          CircuitPlayground.setPixelColor(i, 255, 255, 255); //turns all of the red countdown LEDs white again, showing the timer is restarted
+        }
       }
     }
       timer=0; //after 5 seconds, if the button was not released, resets timer variable
